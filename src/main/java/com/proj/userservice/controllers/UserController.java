@@ -1,5 +1,6 @@
 package com.proj.userservice.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.proj.userservice.DTO.*;
 import com.proj.userservice.exceptions.PasswordNotMatchException;
 import com.proj.userservice.exceptions.TokenNotFoundException;
@@ -23,7 +24,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public UserResponseDTO signup(@RequestBody UserRequestDTO userdto) {
+    public UserResponseDTO signup(@RequestBody UserRequestDTO userdto) throws JsonProcessingException {
         String name = userdto.getName();
         String email = userdto.getEmail();
         String pwd = userdto.getPwd();

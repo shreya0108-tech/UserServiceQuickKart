@@ -1,5 +1,8 @@
 package com.proj.userservice.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.proj.userservice.DTO.SendEmail;
 import com.proj.userservice.exceptions.PasswordNotMatchException;
 import com.proj.userservice.exceptions.TokenNotFoundException;
 import com.proj.userservice.exceptions.UserNotFoundException;
@@ -28,9 +31,10 @@ public class UserService {
     TokenRepository tokenRepository;
     @Autowired
     KafkaTemplate<String,String> kafkaTemplate;
+    @Autowired
+    ObjectMapper objectMapper;
 
-    public User createUser(String name, String email, String pwd)
-    {
+    public User createUser(String name, String email, String pwd) throws JsonProcessingException {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
@@ -38,6 +42,14 @@ public class UserService {
         userRepository.save(user);
 
         //I want to publish this event to the message queue - kafka
+
+        SendEmail sendEmailDto = new SendEmail();
+        sendEmailDto.setTo("ksajal381@gmail.com");
+        sendEmailDto.setSubject("Welcome to Kafka");
+        sendEmailDto.setBody("Hi, happy to see you using Kafka");
+        kafkaTemplate.send("Send email",objectMapper.writeValueAsString(sendEmailDto));
+
+        //kafka queue - [{send_Email, {"to" : "" , from : "" , "body}]
 
         return user;
     }
